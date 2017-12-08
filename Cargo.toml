@@ -1,0 +1,19 @@
+[package]
+name = "fastapprox"
+version = "0.1.0"
+authors = ["Alexey Suslov <alexey.suslov@gmail.com>"]
+
+[[bench]]
+name = "tests"
+harness = false
+
+[build-dependencies]
+gcc = "0.3.54"
+
+[dev-dependencies]
+bencher = "0.1.4"
+special = "0.3.2"
+statrs = "0.7.0"
+
+[profile.bench]
+lto = true
