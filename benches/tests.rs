@@ -89,7 +89,7 @@ fn sigmoid_faster(bench: &mut Bencher) {
 }
 
 fn ln_gamma_special(bench: &mut Bencher) {
-    run(bench, |b| special::ln_gamma(b as f64).0 as f32)
+    run(bench, |b| special::Gamma::ln_gamma(b as f64).0 as f32)
 }
 
 fn ln_gamma_statrs(bench: &mut Bencher) {
@@ -105,7 +105,7 @@ fn ln_gamma_faster(bench: &mut Bencher) {
 }
 
 fn digamma_special(bench: &mut Bencher) {
-    run(bench, |b| special::digamma(b as f64) as f32)
+    run(bench, |b| special::Gamma::digamma(b as f64) as f32)
 }
 
 fn digamma_statrs(bench: &mut Bencher) {
@@ -121,7 +121,7 @@ fn digamma_faster(bench: &mut Bencher) {
 }
 
 fn erfc_special(bench: &mut Bencher) {
-    run(bench, |b| special::erfc(b as f64) as f32)
+    run(bench, |b| special::Error::erfc(b as f64) as f32)
 }
 
 fn erfc_fast(bench: &mut Bencher) {
@@ -137,7 +137,7 @@ fn erf_statrs(bench: &mut Bencher) {
 }
 
 fn erf_special(bench: &mut Bencher) {
-    run(bench, |b| special::erf(b as f64) as f32)
+    run(bench, |b| special::Error::erf(b as f64) as f32)
 }
 
 fn erf_fast(bench: &mut Bencher) {
