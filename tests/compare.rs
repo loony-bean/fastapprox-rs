@@ -127,8 +127,8 @@ fn test_lgamma_approx() {
 
 #[test]
 fn test_lgamma_exact() {
-    compare_near(fast::ln_gamma, |x| special::ln_gamma(x as f64).0 as f32, POS_FLOATS);
-    compare_far(faster::ln_gamma, |x| special::ln_gamma(x as f64).0 as f32, POS_FLOATS);
+    compare_near(fast::ln_gamma, |x| special::Gamma::ln_gamma(x as f64).0 as f32, POS_FLOATS);
+    compare_far(faster::ln_gamma, |x| special::Gamma::ln_gamma(x as f64).0 as f32, POS_FLOATS);
 }
 
 #[test]
@@ -139,8 +139,8 @@ fn test_digamma_approx() {
 
 #[test]
 fn test_digamma_exact() {
-    compare_near(fast::digamma, |x| special::digamma(x as f64) as f32, POS_FLOATS);
-    compare_far(faster::digamma, |x| special::digamma(x as f64) as f32, POS_FLOATS);
+    compare_near(fast::digamma, |x| special::Gamma::digamma(x as f64) as f32, POS_FLOATS);
+    compare_far(faster::digamma, |x| special::Gamma::digamma(x as f64) as f32, POS_FLOATS);
 }
 
 #[test]
@@ -151,8 +151,8 @@ fn test_erf_approx() {
 
 #[test]
 fn test_erf_exact() {
-    compare_near(fast::erf, |x| special::erf(x as f64) as f32, POS_FLOATS);
-    compare_far(faster::erf, |x| special::erf(x as f64) as f32, POS_FLOATS);
+    compare_near(fast::erf, |x| special::Error::erf(x as f64) as f32, POS_FLOATS);
+    compare_far(faster::erf, |x| special::Error::erf(x as f64) as f32, POS_FLOATS);
 }
 
 #[test]
@@ -163,8 +163,8 @@ fn test_erfc_approx() {
 
 #[test]
 fn test_erfc_exact() {
-    compare_near(fast::erfc, |x| special::erfc(x as f64) as f32, POS_FLOATS);
-    compare_far(faster::erfc, |x| special::erfc(x as f64) as f32, POS_FLOATS);
+    compare_near(fast::erfc, |x| special::Error::erfc(x as f64) as f32, POS_FLOATS);
+    compare_far(faster::erfc, |x| special::Error::erfc(x as f64) as f32, POS_FLOATS);
 }
 
 #[test]
