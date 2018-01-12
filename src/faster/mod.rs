@@ -1,5 +1,6 @@
 use bits::*;
 
+/// Base 2 logarithm.
 #[inline]
 pub fn log2(x: f32) -> f32 {
     let mut y = to_bits(x) as f32;
@@ -7,6 +8,7 @@ pub fn log2(x: f32) -> f32 {
     y - 126.94269504_f32
 }
 
+/// Natural logarithm.
 #[inline]
 pub fn ln(x: f32) -> f32 {
     let mut y = to_bits(x) as f32;
@@ -14,11 +16,7 @@ pub fn ln(x: f32) -> f32 {
     y - 87.989971088_f32
 }
 
-#[inline]
-pub fn pow(x: f32, p: f32) -> f32 {
-    pow2(p * log2(x))
-}
-
+/// Raises 2 to a floating point power.
 #[inline]
 pub fn pow2(p: f32) -> f32 {
     let clipp = if p < -126.0 { -126.0_f32 } else { p };
@@ -26,27 +24,42 @@ pub fn pow2(p: f32) -> f32 {
     from_bits(v)
 }
 
+/// Raises a number to a floating point power.
+#[inline]
+pub fn pow(x: f32, p: f32) -> f32 {
+    pow2(p * log2(x))
+}
+
+/// Exponential function.
 #[inline]
 pub fn exp(p: f32) -> f32 {
     pow2(1.442695040_f32 * p)
 }
 
+/// Sigmoid function.
 #[inline]
 pub fn sigmoid(x: f32) -> f32 {
     1.0_f32 / (1.0_f32 + exp(-x))
 }
 
+/// Natural logarithm of the Gamma function.
+///
+/// Only works for positive values.
 #[inline]
 pub fn ln_gamma(x: f32) -> f32 {
     -0.0810614667_f32 - x - ln(x) + (0.5_f32 + x) * ln(1.0_f32 + x)
 }
 
+/// Digamma function.
+///
+/// Only works for positive values.
 #[inline]
 pub fn digamma(x: f32) -> f32 {
     let onepx = 1.0_f32 + x;
     -1.0_f32 / x - 1.0_f32 / (2.0_f32 * onepx) + ln(onepx)
 }
 
+/// Complementary error function.
 #[inline]
 pub fn erfc(x: f32) -> f32 {
     const K: f32 = 3.3509633149424609;
@@ -54,11 +67,13 @@ pub fn erfc(x: f32) -> f32 {
     2.0_f32 / (1.0_f32 + pow2(K * x))
 }
 
+/// Error function.
 #[inline]
 pub fn erf(x: f32) -> f32 {
     1.0_f32 - erfc(x)
 }
 
+/// Inverse error function.
 #[inline]
 pub fn erf_inv(x: f32) -> f32 {
     const INVK: f32 = 0.30004578719350504;
@@ -66,21 +81,25 @@ pub fn erf_inv(x: f32) -> f32 {
     INVK * log2((1.0_f32 + x) / (1.0_f32 - x))
 }
 
+/// Hyperbolic sine function.
 #[inline]
 pub fn sinh(p: f32) -> f32 {
     0.5_f32 * (exp(p) - exp(-p))
 }
 
+/// Hyperbolic cosine function.
 #[inline]
 pub fn cosh(p: f32) -> f32 {
     0.5_f32 * (exp(p) + exp(-p))
 }
 
+/// Hyperbolic tangent function.
 #[inline]
 pub fn tanh(p: f32) -> f32 {
     -1.0_f32 + 2.0_f32 / (1.0_f32 + exp(-2.0_f32 * p))
 }
 
+/// Lambert W function.
 #[inline]
 pub fn lambertw(x: f32) -> f32 {
     const THRESHOLD: f32 = 2.26445;
@@ -98,6 +117,7 @@ pub fn lambertw(x: f32) -> f32 {
     (w * w + expw * x) / (1.0_f32 + w)
 }
 
+/// Exponent of Lambert W function.
 #[inline]
 pub fn lambertwexpx(x: f32) -> f32 {
     const K: f32 = 1.1765631309;
@@ -115,6 +135,7 @@ pub fn lambertwexpx(x: f32) -> f32 {
     w * (1.0_f32 + x - logw) / (1.0_f32 + w)
 }
 
+/// Sine of a number in \[-π, π\], in radians.
 #[inline]
 pub fn sin(x: f32) -> f32 {
     const FOUROVERPI: f32 = 1.2732395447351627;
@@ -134,6 +155,9 @@ pub fn sin(x: f32) -> f32 {
     qpprox * (Q + from_bits(p) * qpprox)
 }
 
+/// Sine in radians.
+///
+/// The range reduction technique used here will be hopelessly inaccurate for |x| >> 1000.
 #[inline]
 pub fn sinfull(x: f32) -> f32 {
     const TWOPI: f32 = 6.2831853071795865;
@@ -144,6 +168,14 @@ pub fn sinfull(x: f32) -> f32 {
     sin((half + (k as f32)) * TWOPI - x)
 }
 
+/// Cosine of a number in \[-π, π\], in radians.
+///
+/// # Examples
+///
+/// ```
+/// assert_eq!(f32::cos(1.0), 0.5403023);
+/// assert_eq!(fastapprox::faster::cos(1.0), 0.5357177);
+/// ```
 #[inline]
 pub fn cos(x: f32) -> f32 {
     const TWOOVERPI: f32 = 0.63661977236758134;
@@ -156,17 +188,31 @@ pub fn cos(x: f32) -> f32 {
     qpprox + P * qpprox * (1.0_f32 - qpprox * qpprox)
 }
 
+/// Cosine in radians.
+///
+/// The range reduction technique used here will be hopelessly inaccurate for |x| >> 1000.
+///
+/// # Examples
+///
+/// ```
+/// assert_eq!(f32::cos(10.0), -0.8390715);
+/// assert_eq!(fastapprox::faster::cosfull(10.0), -0.8394889);
+/// ```
 #[inline]
 pub fn cosfull(x: f32) -> f32 {
     const HALFPI: f32 = 1.5707963267948966;
     sinfull(x + HALFPI)
 }
 
+/// Tangent of a number in \[-π/2, π/2\], in radians.
 #[inline]
 pub fn tan(x: f32) -> f32 {
     sin(x) / cos(x)
 }
 
+/// Tangent in radians.
+///
+/// The range reduction technique used here will be hopelessly inaccurate for |x| >> 1000.
 #[inline]
 pub fn tanfull(x: f32) -> f32 {
     const TWOPI: f32 = 6.2831853071795865;
