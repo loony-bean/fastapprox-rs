@@ -1,26 +1,9 @@
-[package]
-name = "fastapprox"
-description = "Fast approximate versions of certain functions that arise in machine learning"
-version = "0.1.0"
-authors = ["Alexey Suslov <alexey.suslov@gmail.com>"]
-license = "MIT"
-repository = "https://github.com/loony-bean/fastapprox-rs"
-keywords = ["math", "machine-learning", "approximation"]
+[workspace]
 
-[badges]
-travis-ci = { repository = "loony-bean/fastapprox-rs", branch = "master" }
-
-[[bench]]
-name = "tests"
-harness = false
-
-[build-dependencies]
-gcc = "0.3.54"
-
-[dev-dependencies]
-bencher = "0.1.4"
-special = "0.7.7"
-statrs = "0.9.0"
+members = [
+    "fastapprox",
+    "fastapprox_tests",
+]
 
 [profile.bench]
 lto = true
