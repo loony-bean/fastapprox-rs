@@ -1,4 +1,4 @@
-use bits::*;
+use crate::bits::*;
 
 /// Base 2 logarithm.
 #[inline]

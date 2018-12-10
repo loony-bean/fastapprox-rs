@@ -1,5 +1,5 @@
-use faster;
-use bits::*;
+use crate::faster;
+use crate::bits::*;
 
 /// Base 2 logarithm.
 #[inline]
