@@ -151,8 +151,8 @@ fn test_erf_approx() {
 
 #[test]
 fn test_erf_exact() {
-    compare_near(fast::erf, |x| special::Error::erf(x as f64) as f32, POS_FLOATS);
-    compare_far(faster::erf, |x| special::Error::erf(x as f64) as f32, POS_FLOATS);
+    compare_near(fast::erf, |x| special::Error::error(x as f64) as f32, POS_FLOATS);
+    compare_far(faster::erf, |x| special::Error::error(x as f64) as f32, POS_FLOATS);
 }
 
 #[test]
@@ -163,8 +163,8 @@ fn test_erfc_approx() {
 
 #[test]
 fn test_erfc_exact() {
-    compare_near(fast::erfc, |x| special::Error::erfc(x as f64) as f32, POS_FLOATS);
-    compare_far(faster::erfc, |x| special::Error::erfc(x as f64) as f32, POS_FLOATS);
+    compare_near(fast::erfc, |x| special::Error::compl_error(x as f64) as f32, POS_FLOATS);
+    compare_far(faster::erfc, |x| special::Error::compl_error(x as f64) as f32, POS_FLOATS);
 }
 
 #[test]

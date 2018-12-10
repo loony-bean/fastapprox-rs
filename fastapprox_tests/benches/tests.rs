@@ -121,7 +121,7 @@ fn digamma_faster(bench: &mut Bencher) {
 }
 
 fn erfc_special(bench: &mut Bencher) {
-    run(bench, |b| special::Error::erfc(b as f64) as f32)
+    run(bench, |b| special::Error::compl_error(b as f64) as f32)
 }
 
 fn erfc_fast(bench: &mut Bencher) {
@@ -137,7 +137,7 @@ fn erf_statrs(bench: &mut Bencher) {
 }
 
 fn erf_special(bench: &mut Bencher) {
-    run(bench, |b| special::Error::erf(b as f64) as f32)
+    run(bench, |b| special::Error::error(b as f64) as f32)
 }
 
 fn erf_fast(bench: &mut Bencher) {
