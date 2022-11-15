@@ -1,11 +1,10 @@
 use crate::faster;
-use crate::bits::*;
 
 /// Base 2 logarithm.
 #[inline]
 pub fn log2(x: f32) -> f32 {
-    let vx = to_bits(x);
-    let mx = from_bits((vx & 0x007FFFFF_u32) | 0x3f000000);
+    let vx = x.to_bits();
+    let mx = f32::from_bits((vx & 0x007FFFFF_u32) | 0x3f000000);
     let mut y = vx as f32;
     y *= 1.1920928955078125e-7_f32;
     y - 124.22551499_f32 - 1.498030302_f32 * mx - 1.72587999_f32 / (0.3520887068_f32 + mx)
@@ -24,8 +23,10 @@ pub fn pow2(p: f32) -> f32 {
     let clipp = if p < -126.0 { -126.0_f32 } else { p };
     let w = clipp as i32;
     let z = clipp - (w as f32) + offset;
-    let v = ((1 << 23) as f32 * (clipp + 121.2740575_f32 + 27.7280233_f32 / (4.84252568_f32 - z) - 1.49012907_f32 * z)) as u32;
-    from_bits(v)
+    let v = ((1 << 23) as f32
+        * (clipp + 121.2740575_f32 + 27.7280233_f32 / (4.84252568_f32 - z) - 1.49012907_f32 * z))
+        as u32;
+    f32::from_bits(v)
 }
 
 /// Raises a number to a floating point power.
@@ -76,13 +77,14 @@ pub fn erfc(x: f32) -> f32 {
     const B: f32 = 15.418191568719577;
     const C: f32 = 5.609846028328545;
 
-    let mut v = to_bits(C * x);
+    let mut v = (C * x).to_bits();
     let xsq = x * x;
     let xquad = xsq * xsq;
 
     v |= 0x80000000;
 
-    2.0_f32 / (1.0_f32 + pow2(K * x)) - A * x * (B * xquad - 1.0_f32) * faster::pow2(from_bits(v))
+    2.0_f32 / (1.0_f32 + pow2(K * x))
+        - A * x * (B * xquad - 1.0_f32) * faster::pow2(f32::from_bits(v))
 }
 
 /// Error function.
@@ -169,22 +171,24 @@ pub fn sin(x: f32) -> f32 {
     const FOUROVERPISQ: f32 = 0.40528473456935109;
     const Q: f32 = 0.78444488374548933;
 
-    let mut p = to_bits(0.20363937680730309_f32);
-    let mut r = to_bits(0.015124940802184233_f32);
-    let mut s = to_bits(-0.0032225901625579573_f32);
+    let mut p = 0.20363937680730309_f32.to_bits();
+    let mut r = 0.015124940802184233_f32.to_bits();
+    let mut s = (-0.0032225901625579573_f32).to_bits();
 
-    let mut v = to_bits(x);
+    let mut v = x.to_bits();
     let sign = v & 0x80000000;
     v &= 0x7FFFFFFF;
 
-    let qpprox = FOUROVERPI * x - FOUROVERPISQ * x * from_bits(v);
+    let qpprox = FOUROVERPI * x - FOUROVERPISQ * x * f32::from_bits(v);
     let qpproxsq = qpprox * qpprox;
 
     p |= sign;
     r |= sign;
     s ^= sign;
 
-    Q * qpprox + qpproxsq * (from_bits(p) + qpproxsq * (from_bits(r) + qpproxsq * from_bits(s)))
+    Q * qpprox
+        + qpproxsq
+            * (f32::from_bits(p) + qpproxsq * (f32::from_bits(r) + qpproxsq * f32::from_bits(s)))
 }
 
 /// Sine in radians.

@@ -92,6 +92,3 @@ pub mod fast;
 
 /// Faster approximations with considerable error.
 pub mod faster;
-
-/// Raw bits manipulations (public for pedagogical reasons).
-pub mod bits;

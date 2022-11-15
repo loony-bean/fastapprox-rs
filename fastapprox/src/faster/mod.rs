@@ -1,9 +1,7 @@
-use crate::bits::*;
-
 /// Base 2 logarithm.
 #[inline]
 pub fn log2(x: f32) -> f32 {
-    let mut y = to_bits(x) as f32;
+    let mut y = x.to_bits() as f32;
     y *= 1.1920928955078125e-7_f32;
     y - 126.94269504_f32
 }
@@ -11,7 +9,7 @@ pub fn log2(x: f32) -> f32 {
 /// Natural logarithm.
 #[inline]
 pub fn ln(x: f32) -> f32 {
-    let mut y = to_bits(x) as f32;
+    let mut y = x.to_bits() as f32;
     y *= 8.2629582881927490e-8_f32;
     y - 87.989971088_f32
 }
@@ -21,7 +19,7 @@ pub fn ln(x: f32) -> f32 {
 pub fn pow2(p: f32) -> f32 {
     let clipp = if p < -126.0 { -126.0_f32 } else { p };
     let v = ((1 << 23) as f32 * (clipp + 126.94269504_f32)) as u32;
-    from_bits(v)
+    f32::from_bits(v)
 }
 
 /// Raises a number to a floating point power.
@@ -142,17 +140,17 @@ pub fn sin(x: f32) -> f32 {
     const FOUROVERPISQ: f32 = 0.40528473456935109;
     const Q: f32 = 0.77633023248007499;
 
-    let mut p = to_bits(0.22308510060189463_f32);
-    let mut v = to_bits(x);
+    let mut p = 0.22308510060189463_f32.to_bits();
+    let mut v = x.to_bits();
 
     let sign: u32 = v & 0x80000000;
     v &= 0x7FFFFFFF;
 
-    let qpprox = FOUROVERPI * x - FOUROVERPISQ * x * from_bits(v);
+    let qpprox = FOUROVERPI * x - FOUROVERPISQ * x * f32::from_bits(v);
 
     p |= sign;
 
-    qpprox * (Q + from_bits(p) * qpprox)
+    qpprox * (Q + f32::from_bits(p) * qpprox)
 }
 
 /// Sine in radians.
@@ -181,9 +179,9 @@ pub fn cos(x: f32) -> f32 {
     const TWOOVERPI: f32 = 0.63661977236758134;
     const P: f32 = 0.54641335845679634;
 
-    let v = to_bits(x) & 0x7FFFFFFF;
+    let v = x.to_bits() & 0x7FFFFFFF;
 
-    let qpprox = 1.0_f32 - TWOOVERPI * from_bits(v);
+    let qpprox = 1.0_f32 - TWOOVERPI * f32::from_bits(v);
 
     qpprox + P * qpprox * (1.0_f32 - qpprox * qpprox)
 }
