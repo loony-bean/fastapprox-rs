@@ -3,17 +3,15 @@ use crate::bits::*;
 /// Base 2 logarithm.
 #[inline]
 pub fn log2(x: f32) -> f32 {
-    let mut y = to_bits(x) as f32;
-    y *= 1.1920928955078125e-7_f32;
-    y - 126.94269504_f32
+    let y = to_bits(x) as f32;
+    y.mul_add(1.1920928955078125e-7_f32, -126.94269504_f32)
 }
 
 /// Natural logarithm.
 #[inline]
 pub fn ln(x: f32) -> f32 {
-    let mut y = to_bits(x) as f32;
-    y *= 8.2629582881927490e-8_f32;
-    y - 87.989971088_f32
+    let y = to_bits(x) as f32;
+    y.mul_add(8.2629582881927490e-8_f32, -87.989971088_f32)
 }
 
 /// Raises 2 to a floating point power.
@@ -47,7 +45,7 @@ pub fn sigmoid(x: f32) -> f32 {
 /// Only works for positive values.
 #[inline]
 pub fn ln_gamma(x: f32) -> f32 {
-    -0.0810614667_f32 - x - ln(x) + (0.5_f32 + x) * ln(1.0_f32 + x)
+    (0.5_f32 + x).mul_add(ln(1.0_f32 + x), -0.0810614667_f32 - x - ln(x))
 }
 
 /// Digamma function.
@@ -104,17 +102,29 @@ pub fn tanh(p: f32) -> f32 {
 pub fn lambertw(x: f32) -> f32 {
     const THRESHOLD: f32 = 2.26445;
 
-    let c = if x < THRESHOLD { 1.546865557_f32 } else { 1.0_f32 };
-    let d = if x < THRESHOLD { 2.250366841_f32 } else { 0.0_f32 };
-    let a = if x < THRESHOLD { -0.737769969_f32 } else { 0.0_f32 };
+    let c = if x < THRESHOLD {
+        1.546865557_f32
+    } else {
+        1.0_f32
+    };
+    let d = if x < THRESHOLD {
+        2.250366841_f32
+    } else {
+        0.0_f32
+    };
+    let a = if x < THRESHOLD {
+        -0.737769969_f32
+    } else {
+        0.0_f32
+    };
 
-    let logterm = ln(c * x + d);
+    let logterm = ln(c.mul_add(x, d));
     let loglogterm = ln(logterm);
 
     let w = a + logterm - loglogterm + loglogterm / logterm;
     let expw = exp(-w);
 
-    (w * w + expw * x) / (1.0_f32 + w)
+    w.mul_add(w, expw * x) / (1.0_f32 + w)
 }
 
 /// Exponent of Lambert W function.
@@ -148,11 +158,11 @@ pub fn sin(x: f32) -> f32 {
     let sign: u32 = v & 0x80000000;
     v &= 0x7FFFFFFF;
 
-    let qpprox = FOUROVERPI * x - FOUROVERPISQ * x * from_bits(v);
+    let qpprox = FOUROVERPI.mul_add(x, -FOUROVERPISQ * x * from_bits(v));
 
     p |= sign;
 
-    qpprox * (Q + from_bits(p) * qpprox)
+    qpprox * from_bits(p).mul_add(qpprox, Q)
 }
 
 /// Sine in radians.
@@ -165,7 +175,7 @@ pub fn sinfull(x: f32) -> f32 {
 
     let k: i32 = (x * INVTWOPI) as i32;
     let half = if x < 0.0_f32 { -0.5_f32 } else { 0.5_f32 };
-    sin((half + (k as f32)) * TWOPI - x)
+    sin((half + (k as f32)).mul_add(TWOPI, -x))
 }
 
 /// Cosine of a number in \[-π, π\], in radians.
@@ -183,9 +193,9 @@ pub fn cos(x: f32) -> f32 {
 
     let v = to_bits(x) & 0x7FFFFFFF;
 
-    let qpprox = 1.0_f32 - TWOOVERPI * from_bits(v);
+    let qpprox = (-TWOOVERPI).mul_add(from_bits(v), 1.0_f32);
 
-    qpprox + P * qpprox * (1.0_f32 - qpprox * qpprox)
+    (P * qpprox).mul_add(qpprox.mul_add(-qpprox, 1.0_f32), qpprox)
 }
 
 /// Cosine in radians.
@@ -196,7 +206,7 @@ pub fn cos(x: f32) -> f32 {
 ///
 /// ```
 /// assert_eq!(f32::cos(10.0), -0.8390715);
-/// assert_eq!(fastapprox::faster::cosfull(10.0), -0.8394889);
+/// assert_eq!(fastapprox::faster::cosfull(10.0), -0.8394891);
 /// ```
 #[inline]
 pub fn cosfull(x: f32) -> f32 {
@@ -220,7 +230,7 @@ pub fn tanfull(x: f32) -> f32 {
 
     let k: i32 = (x * INVTWOPI) as i32;
     let half = if x < 0.0_f32 { -0.5_f32 } else { 0.5_f32 };
-    let xnew = x - (half + (k as f32)) * TWOPI;
+    let xnew = (-TWOPI).mul_add(half + (k as f32), x);
 
     sin(xnew) / cos(xnew)
 }
