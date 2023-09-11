@@ -1,5 +1,5 @@
-use crate::faster;
 use crate::bits::*;
+use crate::faster;
 
 /// Base 2 logarithm.
 #[inline]
@@ -24,7 +24,9 @@ pub fn pow2(p: f32) -> f32 {
     let clipp = if p < -126.0 { -126.0_f32 } else { p };
     let w = clipp as i32;
     let z = clipp - (w as f32) + offset;
-    let v = ((1 << 23) as f32 * (clipp + 121.2740575_f32 + 27.7280233_f32 / (4.84252568_f32 - z) - 1.49012907_f32 * z)) as u32;
+    let v = ((1 << 23) as f32
+        * (clipp + 121.2740575_f32 + 27.7280233_f32 / (4.84252568_f32 - z) - 1.49012907_f32 * z))
+        as u32;
     from_bits(v)
 }
 
@@ -65,7 +67,9 @@ pub fn digamma(x: f32) -> f32 {
     let twopx = 2.0_f32 + x;
     let logterm = ln(twopx);
 
-    (-48.0_f32 + x * (-157.0_f32 + x * (-127.0_f32 - 30.0_f32 * x))) / (12.0_f32 * x * (1.0_f32 + x) * twopx * twopx) + logterm
+    (-48.0_f32 + x * (-157.0_f32 + x * (-127.0_f32 - 30.0_f32 * x)))
+        / (12.0_f32 * x * (1.0_f32 + x) * twopx * twopx)
+        + logterm
 }
 
 /// Complementary error function.
@@ -128,9 +132,21 @@ pub fn tanh(p: f32) -> f32 {
 pub fn lambertw(x: f32) -> f32 {
     const THRESHOLD: f32 = 2.26445;
 
-    let c = if x < THRESHOLD { 1.546865557_f32 } else { 1.0_f32 };
-    let d = if x < THRESHOLD { 2.250366841_f32 } else { 0.0_f32 };
-    let a = if x < THRESHOLD { -0.737769969_f32 } else { 0.0_f32 };
+    let c = if x < THRESHOLD {
+        1.546865557_f32
+    } else {
+        1.0_f32
+    };
+    let d = if x < THRESHOLD {
+        2.250366841_f32
+    } else {
+        0.0_f32
+    };
+    let a = if x < THRESHOLD {
+        -0.737769969_f32
+    } else {
+        0.0_f32
+    };
 
     let logterm = ln(c * x + d);
     let loglogterm = ln(logterm);
@@ -140,7 +156,8 @@ pub fn lambertw(x: f32) -> f32 {
     let xexpminusw = x * expminusw;
     let pexpminusw = xexpminusw - minusw;
 
-    (2.0_f32 * xexpminusw - minusw * (4.0_f32 * xexpminusw - minusw * pexpminusw)) / (2.0_f32 + pexpminusw * (2.0_f32 - minusw))
+    (2.0_f32 * xexpminusw - minusw * (4.0_f32 * xexpminusw - minusw * pexpminusw))
+        / (2.0_f32 + pexpminusw * (2.0_f32 - minusw))
 }
 
 /// Exponent of Lambert W function.
@@ -153,7 +170,7 @@ pub fn lambertwexpx(x: f32) -> f32 {
     let powarg = if x < K { A * (x - K) } else { 0.0_f32 };
 
     let logterm = ln(logarg);
-    let powterm = faster::pow2(powarg);  // don't need accuracy here
+    let powterm = faster::pow2(powarg); // don't need accuracy here
 
     let w = powterm * (logarg - logterm + logterm / logarg);
     let logw = ln(w);

@@ -1,60 +1,80 @@
 #![cfg(test)]
 
+extern crate fastapprox;
 extern crate special;
 extern crate statrs;
-extern crate fastapprox;
 
-use std::convert::Into;
 use fastapprox::{fast, faster};
 use statrs::function::erf;
+use std::convert::Into;
 
 mod c;
 
 const FLOATS: &[f32] = &[-5.0, -0.25, -0.05, 0.0, 0.05, 1.0, 2.0, 3.0, 10.0];
 const POS_FLOATS: &[f32] = &[0.01, 0.05, 1.0, 2.1, 3.5, 100.0];
 const BETWEEN_ONES: &[f32] = &[-0.9, -0.5, -0.1, -0.01, 0.0, 0.01, 0.1, 0.5, 0.9];
-const BETWEEN_PIS: &[f32] = &[-3.14, -1.5, -1.0, -0.5, -0.1, -0.01, 0.0, 0.01, 0.1, 0.5, 1.0, 1.5, 3.14];
-const BETWEEN_HALFPIS: &[f32] = &[-1.56, -1.5, -1.0, -0.5, -0.1, -0.01, 0.0, 0.01, 0.1, 0.5, 1.0, 1.5, 1.56];
+const BETWEEN_PIS: &[f32] = &[
+    -3.14, -1.5, -1.0, -0.5, -0.1, -0.01, 0.0, 0.01, 0.1, 0.5, 1.0, 1.5, 3.14,
+];
+const BETWEEN_HALFPIS: &[f32] = &[
+    -1.56, -1.5, -1.0, -0.5, -0.1, -0.01, 0.0, 0.01, 0.1, 0.5, 1.0, 1.5, 1.56,
+];
 
 fn compare<F1, F2, T>(func: F1, base: F2, values: &[f32], tolerance: T)
-    where
-        F1: Fn(f32) -> f32,
-        F2: Fn(f32) -> f32,
-        T: Into<Option<f32>>
+where
+    F1: Fn(f32) -> f32,
+    F2: Fn(f32) -> f32,
+    T: Into<Option<f32>>,
 {
     let tol = tolerance.into();
     for value in values {
         let r1 = func(*value);
         let r2 = base(*value);
         if let Some(tolerance) = tol {
-            let d = if r2.abs() < 0.1 { (r1 - r2).abs() } else { ((r1 - r2) / r2).abs() };
-            assert!(d < tolerance, "func({}) = {}, but base({}) = {}, Δ == {}", value, r1, value, r2, d);
+            let d = if r2.abs() < 0.1 {
+                (r1 - r2).abs()
+            } else {
+                ((r1 - r2) / r2).abs()
+            };
+            assert!(
+                d < tolerance,
+                "func({}) = {}, but base({}) = {}, Δ == {}",
+                value,
+                r1,
+                value,
+                r2,
+                d
+            );
         } else {
-            assert_eq!(r1, r2, "func({}) = {}, but base({}) = {}", value, r1, value, r2);
+            assert_eq!(
+                r1, r2,
+                "func({}) = {}, but base({}) = {}",
+                value, r1, value, r2
+            );
         }
     }
 }
 
 fn compare_exact<F1, F2>(func: F1, base: F2, values: &[f32])
-    where
-        F1: Fn(f32) -> f32,
-        F2: Fn(f32) -> f32
+where
+    F1: Fn(f32) -> f32,
+    F2: Fn(f32) -> f32,
 {
     compare(func, base, values, None);
 }
 
 fn compare_near<F1, F2>(func: F1, base: F2, values: &[f32])
-    where
-        F1: Fn(f32) -> f32,
-        F2: Fn(f32) -> f32
+where
+    F1: Fn(f32) -> f32,
+    F2: Fn(f32) -> f32,
 {
     compare(func, base, values, 0.01);
 }
 
 fn compare_far<F1, F2>(func: F1, base: F2, values: &[f32])
-    where
-        F1: Fn(f32) -> f32,
-        F2: Fn(f32) -> f32
+where
+    F1: Fn(f32) -> f32,
+    F2: Fn(f32) -> f32,
 {
     compare(func, base, values, 0.15);
 }
@@ -67,8 +87,8 @@ fn test_pow2_approx() {
 
 #[test]
 fn test_pow2_exact() {
-    compare_near(fast::pow2, |x| (2.0_f32).powf(x) , FLOATS);
-    compare_far(faster::pow2, |x| (2.0_f32).powf(x) , FLOATS);
+    compare_near(fast::pow2, |x| (2.0_f32).powf(x), FLOATS);
+    compare_far(faster::pow2, |x| (2.0_f32).powf(x), FLOATS);
 }
 
 #[test]
@@ -127,8 +147,16 @@ fn test_lgamma_approx() {
 
 #[test]
 fn test_lgamma_exact() {
-    compare_near(fast::ln_gamma, |x| special::Gamma::ln_gamma(x as f64).0 as f32, POS_FLOATS);
-    compare_far(faster::ln_gamma, |x| special::Gamma::ln_gamma(x as f64).0 as f32, POS_FLOATS);
+    compare_near(
+        fast::ln_gamma,
+        |x| special::Gamma::ln_gamma(x as f64).0 as f32,
+        POS_FLOATS,
+    );
+    compare_far(
+        faster::ln_gamma,
+        |x| special::Gamma::ln_gamma(x as f64).0 as f32,
+        POS_FLOATS,
+    );
 }
 
 #[test]
@@ -139,8 +167,16 @@ fn test_digamma_approx() {
 
 #[test]
 fn test_digamma_exact() {
-    compare_near(fast::digamma, |x| special::Gamma::digamma(x as f64) as f32, POS_FLOATS);
-    compare_far(faster::digamma, |x| special::Gamma::digamma(x as f64) as f32, POS_FLOATS);
+    compare_near(
+        fast::digamma,
+        |x| special::Gamma::digamma(x as f64) as f32,
+        POS_FLOATS,
+    );
+    compare_far(
+        faster::digamma,
+        |x| special::Gamma::digamma(x as f64) as f32,
+        POS_FLOATS,
+    );
 }
 
 #[test]
@@ -151,8 +187,16 @@ fn test_erf_approx() {
 
 #[test]
 fn test_erf_exact() {
-    compare_near(fast::erf, |x| special::Error::error(x as f64) as f32, POS_FLOATS);
-    compare_far(faster::erf, |x| special::Error::error(x as f64) as f32, POS_FLOATS);
+    compare_near(
+        fast::erf,
+        |x| special::Error::error(x as f64) as f32,
+        POS_FLOATS,
+    );
+    compare_far(
+        faster::erf,
+        |x| special::Error::error(x as f64) as f32,
+        POS_FLOATS,
+    );
 }
 
 #[test]
@@ -163,8 +207,16 @@ fn test_erfc_approx() {
 
 #[test]
 fn test_erfc_exact() {
-    compare_near(fast::erfc, |x| special::Error::compl_error(x as f64) as f32, POS_FLOATS);
-    compare_far(faster::erfc, |x| special::Error::compl_error(x as f64) as f32, POS_FLOATS);
+    compare_near(
+        fast::erfc,
+        |x| special::Error::compl_error(x as f64) as f32,
+        POS_FLOATS,
+    );
+    compare_far(
+        faster::erfc,
+        |x| special::Error::compl_error(x as f64) as f32,
+        POS_FLOATS,
+    );
 }
 
 #[test]
@@ -175,8 +227,16 @@ fn test_inverse_erf_approx() {
 
 #[test]
 fn test_inverse_erf_exact() {
-    compare_near(fast::erf_inv, |x| erf::erf_inv(x as f64) as f32, BETWEEN_ONES);
-    compare_far(faster::erf_inv, |x| erf::erf_inv(x as f64) as f32, BETWEEN_ONES);
+    compare_near(
+        fast::erf_inv,
+        |x| erf::erf_inv(x as f64) as f32,
+        BETWEEN_ONES,
+    );
+    compare_far(
+        faster::erf_inv,
+        |x| erf::erf_inv(x as f64) as f32,
+        BETWEEN_ONES,
+    );
 }
 
 #[test]

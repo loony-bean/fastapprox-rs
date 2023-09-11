@@ -6,14 +6,12 @@ extern crate statrs;
 
 use bencher::Bencher;
 use fastapprox::{fast, faster};
-use statrs::function::{gamma, erf};
+use statrs::function::{erf, gamma};
 
 const ITERATIONS: u32 = 1000;
 
 fn run<F: Fn(f32) -> f32>(bench: &mut Bencher, cb: F) {
-    bench.iter(|| {
-        (0..ITERATIONS).fold(0.0, |a, b| a + cb(b as f32))
-    })
+    bench.iter(|| (0..ITERATIONS).fold(0.0, |a, b| a + cb(b as f32)))
 }
 
 fn log2_std(bench: &mut Bencher) {
@@ -272,7 +270,8 @@ fn tanfull_faster(bench: &mut Bencher) {
     run(bench, faster::tanfull)
 }
 
-benchmark_group!(benches,
+benchmark_group!(
+    benches,
     log2_std,
     log2_fast,
     log2_faster,
@@ -337,5 +336,5 @@ benchmark_group!(benches,
     tanfull_fast,
     tan_faster,
     tanfull_faster
-    );
+);
 benchmark_main!(benches);

@@ -104,9 +104,21 @@ pub fn tanh(p: f32) -> f32 {
 pub fn lambertw(x: f32) -> f32 {
     const THRESHOLD: f32 = 2.26445;
 
-    let c = if x < THRESHOLD { 1.546865557_f32 } else { 1.0_f32 };
-    let d = if x < THRESHOLD { 2.250366841_f32 } else { 0.0_f32 };
-    let a = if x < THRESHOLD { -0.737769969_f32 } else { 0.0_f32 };
+    let c = if x < THRESHOLD {
+        1.546865557_f32
+    } else {
+        1.0_f32
+    };
+    let d = if x < THRESHOLD {
+        2.250366841_f32
+    } else {
+        0.0_f32
+    };
+    let a = if x < THRESHOLD {
+        -0.737769969_f32
+    } else {
+        0.0_f32
+    };
 
     let logterm = ln(c * x + d);
     let loglogterm = ln(logterm);
