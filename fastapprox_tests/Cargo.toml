@@ -1,7 +1,7 @@
 [package]
 name = "fastapprox_tests"
 description = "Test suite for fastapprox crate"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Alexey Suslov <alexey.suslov@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/loony-bean/fastapprox-rs"
@@ -19,6 +19,6 @@ harness = false
 cc = "1"
 
 [dev-dependencies]
-bencher = "0.1.4"
-special = "0.8"
-statrs = "0.10"
+bencher = "0.1.5"
+special = "0.10"
+statrs = "0.16"
